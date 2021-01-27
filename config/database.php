@@ -56,28 +56,6 @@ return [
             'engine' => null,
         ],
 
-        //203测试机
-        'mysql_203' => [
-            'driver' => 'mysql',
-            'read' => [
-                'host' => env('DB_HOST_READ_203', '127.0.0.1'),
-            ],
-            'write' => [
-                'host' => env('DB_HOST_WRITE_203', '127.0.0.1')
-            ],
-            'port' => env('DB_PORT_203', '3306'),
-            'database' => env('DB_DATABASE_203', 'forge'),
-            'username' => env('DB_USERNAME_203', 'forge'),
-            'password' => env('DB_PASSWORD_203', ''),
-            'unix_socket' => env('DB_SOCKET_203', ''),
-            'charset' => 'utf8',
-            'collation' => 'utf8_general_ci',
-            'prefix' => '',
-            'strict' => true,
-            'engine' => null,
-            'sticky' => true,//在同一个请求生命周期中,写入的数据会被立刻读取到(防止主从同步延迟)
-        ],
-
         'pgsql' => [
             'driver' => 'pgsql',
             'host' => env('DB_HOST', '127.0.0.1'),

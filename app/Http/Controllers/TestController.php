@@ -164,9 +164,6 @@ class TestController extends Controller
         //is null
 //        $emptyToken = DB::table('users')->whereNull('remember_token')->get();
 
-        //查询字段必须是datetime格式
-//        $data = DB::connection('mysql_203')->table('forbid_record')->whereDate('created_at', '>', '2020-05-01')->get();
-
         //对比字段值
 //        $data = DB::table('users')->whereColumn('created_at', 'updated_at')->get();
 
