@@ -1,0 +1,16 @@
+# Master 进程
+$ Manager 进程
+* Worker 进程
+^ Task 进程
+
+已知错误
+
+get user [www] info failed
+设置了不存在的用户,若出现该错误生成的worker和task依旧是启动服务的用户
+用户是否存在通过 cat /etc/passwd|grep 用户名 进行查找
+
+
+提示
+
+kill -15 主进程id 可以让swoole相关服务全部停止
+lsof -i:端口号 可以得到主进程id
