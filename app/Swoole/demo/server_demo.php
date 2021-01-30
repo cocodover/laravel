@@ -19,6 +19,16 @@
  */
 
 //此处配置成127.0.0.1之后无法通过外网访问服务,在nginx上做了反向代理
+use Controllers\TaskController;
+use Controllers\WebsocketController;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use Swoole\Atomic;
+use Swoole\Server;
+use Swoole\Server\Task;
+use Swoole\WebSocket\Frame;
+use const Task\RABBITMQ_PUSH;
+use const Task\UNDEFINED;
+
 $server = new swoole_websocket_server('127.0.0.1', 9501);
 
 $server->set([
@@ -41,24 +51,24 @@ $server->set([
     'heartbeat_idle_time' => 12,//连接最大允许空闲的时间,单位 秒
 ]);
 
-$server->on('Start', function (\Swoole\Server $server) {
+$server->on('Start', function (Server $server) {
     echo(date('Y-m-d H:i:s') . ":swoole server start! master pid:{$server->master_pid},manager pid:{$server->manager_pid}\n");
     //设置进程名称
     swoole_set_process_name('swoole_server');
 });
 
-$server->on('Shutdown', function (\Swoole\Server $server) {
+$server->on('Shutdown', function (Server $server) {
     echo(date('Y-m-d H:i:s') . ":swoole server shutdown\n");
 });
 
-$server->on('ManagerStart', function (\Swoole\Server $server) {
+$server->on('ManagerStart', function (Server $server) {
     swoole_set_process_name('swoole_manager');
 });
 
 /*
  * 加载内容尽量放在这里处理,因为此处平滑重启后会重新调用
  */
-$server->on('WorkerStart', function (\Swoole\Server $server, int $workerId) {
+$server->on('WorkerStart', function (Server $server, int $workerId) {
     //判断当前是Worker进程还是Task进程
     if ($server->taskworker === true) {
         swoole_set_process_name('swoole_task_' . $workerId);
@@ -70,7 +80,7 @@ $server->on('WorkerStart', function (\Swoole\Server $server, int $workerId) {
      * 此处加载的文件只能通过重启worker&task重新加载
      */
     //自动加载文件(onRequest事件new对象且文件未引用时会调用到这里)
-    spl_autoload_register(function ($class) {
+    spl_autoload_register(static function ($class) {
         //将\替换为/
         $baseClassPath = str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
         $classPath = __DIR__ . '/' . $baseClassPath;
@@ -101,7 +111,7 @@ $server->on('WorkerStart', function (\Swoole\Server $server, int $workerId) {
     $redisConnection = $database['redis']['connection'];
     $redisPort = $database['redis']['port'];
     $redisPassword = $database['redis']['password'];
-    $redis = new \Redis();
+    $redis = new Redis();
     $redis->connect($redisConnection, $redisPort);
     $redis->auth($redisPassword);
     $server->redis = $redis;
@@ -118,7 +128,7 @@ $server->on('WorkerStart', function (\Swoole\Server $server, int $workerId) {
          * 此处业务场景:多个task进程(生产者)推送消息给队列,多个消费者直接从队列中获取数据并加以处理。考虑到业务场景不再使用发布/订阅模式(不使用交换机)
          */
         //rabbitMQ连接
-        $rabbitMQConnection = new \PhpAmqpLib\Connection\AMQPStreamConnection(
+        $rabbitMQConnection = new AMQPStreamConnection(
             $amqp['chat']['connection']['host'],
             $amqp['chat']['connection']['port'],
             $amqp['chat']['connection']['user'],
@@ -138,15 +148,15 @@ $server->on('WorkerStart', function (\Swoole\Server $server, int $workerId) {
         $server->rabbitMQChannel = $rabbitMQChannel;
 
         //异步任务对象(减少每次创建对象类开销)
-        $server->taskController = new \Controllers\TaskController($server);
+        $server->taskController = new TaskController($server);
     } else {//worker进程需要加载
         //加载websocket控制器
-        $server->websocketController = new \Controllers\WebsocketController();
+        $server->websocketController = new WebsocketController();
     }
     //todo 后续做一个ioc容器,这样就不要每次都注入到server对象里面了(ps:需要考虑协程共用连接问题,此处每开启一个进程会新建一个连接,但是连接却绑定的是server对象？)
 });
 
-$server->on('WorkerError', function (\Swoole\Server $server, int $workerId, int $workerPid, int $exitCode, int $signal) {
+$server->on('WorkerError', function (Server $server, int $workerId, int $workerPid, int $exitCode, int $signal) {
     $msg = json_encode([
         'worker_id' => $workerId,
         'worker_pid' => $workerPid,
@@ -248,7 +258,7 @@ $server->on('Request', function (\Swoole\Http\Request $request, \Swoole\Http\Res
  * function onTask(\Swoole\Server $server, int $taskId, int $srcWorkerId, mixed $data);
  * 开启 task进程协程 api如下(接收参数值以及触发onFinish的api都与不开启时不同)
  */
-$server->on('Task', function (\Swoole\Server $server, \Swoole\Server\Task $task) {
+$server->on('Task', function (Server $server, Task $task) {
     /**
      * @var Controllers\TaskController $taskController
      */
@@ -259,12 +269,12 @@ $server->on('Task', function (\Swoole\Server $server, \Swoole\Server\Task $task)
 
     if (isset($task->data['data'])) {
         //根据任务类型进行对应处理
-        $data['type'] = $task->data['type'] ?? \Task\UNDEFINED;
+        $data['type'] = $task->data['type'] ?? UNDEFINED;
         switch ($data['type']) {
-            case \Task\RABBITMQ_PUSH:
+            case RABBITMQ_PUSH:
                 $taskController->rabbitMQPush($task->data['data']);
                 break;
-            case \Task\UNDEFINED:
+            case UNDEFINED:
             default:
                 echo("warning:task type not defined\n");
                 break;
@@ -279,7 +289,7 @@ $server->on('Task', function (\Swoole\Server $server, \Swoole\Server\Task $task)
  * 与文档有出入:设置了task_worker_num并非要设置onFinish
  * 在worker进程中被调用(与下发task任务的worker进程是同一个)
  */
-$server->on('Finish', function (\Swoole\Server $server, int $taskId, string $data) {
+$server->on('Finish', function (Server $server, int $taskId, string $data) {
     //计算异步任务总共耗时
     $taskSpend = microtime(true) - $data;
     echo("worker {$server->worker_id} task {$taskId} spend {$taskSpend} s\n");
@@ -322,7 +332,7 @@ $server->on('Open', function (\Swoole\WebSocket\Server $server, \Swoole\Http\Req
  * 此处代码不会随平滑重启更新
  * 此处由worker进程与websocket进行交互,一旦通讯成功将由同一个进程处理同一个连接
  */
-$server->on('Message', function (\Swoole\WebSocket\Server $server, \Swoole\WebSocket\Frame $frame) {
+$server->on('Message', function (\Swoole\WebSocket\Server $server, Frame $frame) {
     //收到客户端或服务端发送的关闭帧自定义处理内容(此处dispatch_mode不能设置为1/3,底层会屏蔽 onConnect/onClose 事件)
     if ($frame->opcode === 0x08) {
         /**
@@ -367,7 +377,7 @@ $server->on('Message', function (\Swoole\WebSocket\Server $server, \Swoole\WebSo
     }
 });
 
-$server->on('Close', function (\Swoole\Server $server, int $fd, int $reactorId) {
+$server->on('Close', function (Server $server, int $fd, int $reactorId) {
     /**
      * @var swoole_table $table
      */
@@ -396,7 +406,7 @@ if ($tableFlag === false) {
 $server->table = $table;
 
 //设置无锁计数器
-$atomic = new \Swoole\Atomic();
+$atomic = new Atomic();
 $server->atomic = $atomic;
 
 //设置默认时区

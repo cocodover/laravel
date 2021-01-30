@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 
 class LoginController extends Controller
 {
@@ -58,8 +61,8 @@ class LoginController extends Controller
     /**
      * 自定义登录方法(token登录)
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse|\Symfony\Component\HttpFoundation\Response
-     * @throws \Illuminate\Validation\ValidationException
+     * @return JsonResponse|Response
+     * @throws ValidationException
      */
     public function login(Request $request)
     {
@@ -84,9 +87,9 @@ class LoginController extends Controller
 
     /**
      * 自定义登出方法(token登录)
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function logout()
+    public function logout(): JsonResponse
     {
         //登出
         $user = Auth::guard('api')->user();

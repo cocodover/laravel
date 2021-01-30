@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Events\RecoredFindingEvent;
 use App\Scopes\UserScope;
+use Eloquent;
+use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Carbon;
 
 /**
  * 用户请求记录表
@@ -19,24 +21,24 @@ use Illuminate\Support\Facades\Log;
  * @property string $method 请求方式
  * @property string $route 路由名称
  * @property array|null $request 请求参数
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read mixed $ip_address
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Record createdTime($beginAt = null, $endAt = null)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Record modify()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Record newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Record newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Record query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Record whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Record whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Record whereIp($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Record whereMethod($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Record whereRequest($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Record whereRoute($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Record whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Record whereUri($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Record whereUserId($value)
- * @mixin \Eloquent
+ * @method static Builder|Record createdTime($beginAt = null, $endAt = null)
+ * @method static Builder|Record modify()
+ * @method static Builder|Record newModelQuery()
+ * @method static Builder|Record newQuery()
+ * @method static Builder|Record query()
+ * @method static Builder|Record whereCreatedAt($value)
+ * @method static Builder|Record whereId($value)
+ * @method static Builder|Record whereIp($value)
+ * @method static Builder|Record whereMethod($value)
+ * @method static Builder|Record whereRequest($value)
+ * @method static Builder|Record whereRoute($value)
+ * @method static Builder|Record whereUpdatedAt($value)
+ * @method static Builder|Record whereUri($value)
+ * @method static Builder|Record whereUserId($value)
+ * @mixin Eloquent
  */
 class Record extends Model
 {
@@ -90,7 +92,7 @@ class Record extends Model
      * 访问器
      */
     //获取ip地址信息(访问器字段名称避免与数据库相同)
-    public function getIpAddressAttribute()
+    public function getIpAddressAttribute(): string
     {
         return $this->ip ? long2ip($this->ip) : '未知IP地址';
     }
@@ -143,7 +145,7 @@ class Record extends Model
     /*
      * 动态作用域(过滤器)
      */
-    public function scopeCreatedTime(Builder $query, $beginAt = null, $endAt = null)
+    public function scopeCreatedTime(Builder $query, $beginAt = null, $endAt = null): BuildsQueries
     {
         return $query->when($beginAt, function () use ($query, $beginAt) {
             return $query->where('created_at', '>=', $beginAt);

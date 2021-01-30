@@ -13,24 +13,21 @@ class UserPolicy
      * 查看权限
      * Determine whether the user can view the model.
      *
-     * @param \App\User $user
-     * @param \App\User $model
+     * @param User $user
+     * @param User $model
      * @return mixed
      */
-    public function view(User $user, User $model)
+    public function view(User $user, User $model): bool
     {
-        if ($user->id === $model->id || $user->isSuperAdmin()) {
-            return true;
-        }
-        return false;
+        return $user->id === $model->id || $user->isSuperAdmin();
     }
 
     /**
      * 创建权限
      * Determine whether the user can create models.
      *
-     * @param \App\User $user
-     * @return mixed
+     * @param User $user
+     * @return void
      */
     public function create(User $user)
     {
@@ -41,27 +38,24 @@ class UserPolicy
      * 更新权限
      * Determine whether the user can update the model.
      *
-     * @param \App\User $user
-     * @param \App\User $model
+     * @param User $user
+     * @param User $model
      * @return mixed
      */
-    public function update(User $user, User $model)
+    public function update(User $user, User $model): bool
     {
-        if ($user->id === $model->id || $user->isSuperAdmin()) {
-            return true;
-        }
-        return false;
+        return $user->id === $model->id || $user->isSuperAdmin();
     }
 
     /**
      * 删除权限
      * Determine whether the user can delete the model.
      *
-     * @param \App\User $user
-     * @param \App\User $model
+     * @param User $user
+     * @param User $model
      * @return mixed
      */
-    public function delete(User $user, User $model)
+    public function delete(User $user, User $model): bool
     {
         if ($user->isSuperAdmin()) {
             return true;

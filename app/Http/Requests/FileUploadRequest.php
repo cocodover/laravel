@@ -14,7 +14,7 @@ class FileUploadRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -25,7 +25,7 @@ class FileUploadRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'id' => 'required|integer',
@@ -42,7 +42,7 @@ class FileUploadRequest extends FormRequest
      * 自定义错误提示消息
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'id.required' => 'id字段不能为空',
@@ -57,7 +57,7 @@ class FileUploadRequest extends FormRequest
     /**
      * @return array
      */
-    public function attributes()
+    public function attributes(): array
     {
         return [
             'id' => 'id',

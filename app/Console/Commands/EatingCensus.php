@@ -23,16 +23,6 @@ class EatingCensus extends Command
     protected $description = '技术部恰饭群统计吃饭情况提醒';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return void

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 /**
@@ -27,9 +29,9 @@ class JwtAuthController extends Controller
 
     /**
      * JWT登录
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function login()
+    public function login(): JsonResponse
     {
         $credentials = request(['name', 'password']);
 
@@ -43,15 +45,15 @@ class JwtAuthController extends Controller
 
     /**
      * 刷新token(刷新后旧token无法使用)
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function refresh()
+    public function refresh(): JsonResponse
     {
         try {
             //两种写法效果等同
 //        $token=auth('jwt')->refresh();
             $token = JWTAuth::refresh(JWTAuth::getToken());
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return response()->json(['error' => '刷新时间过期,请重新登录'], 401);
         }
 
@@ -60,9 +62,9 @@ class JwtAuthController extends Controller
 
     /**
      * JWT登出
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function logout()
+    public function logout(): JsonResponse
     {
         auth('jwt')->logout();
 
@@ -71,18 +73,18 @@ class JwtAuthController extends Controller
 
     /**
      * 检查认证是否有效
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function auth()
+    public function auth(): JsonResponse
     {
         return response()->json('用户身份认证通过');
     }
 
     /**
      * 检查授权是否有效
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function permission()
+    public function permission(): JsonResponse
     {
         return response()->json('用户权限认证通过');
     }
@@ -90,9 +92,9 @@ class JwtAuthController extends Controller
     /**
      * 成功响应token格式
      * @param $token
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    private function respondWithToken($token)
+    private function respondWithToken($token): JsonResponse
     {
         return response()->json([
             'access_token' => $token,

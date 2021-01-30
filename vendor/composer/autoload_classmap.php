@@ -45,6 +45,8 @@ return array(
     'App\\Http\\Tools\\Traits\\IpTrait' => $baseDir . '/app/Http/Tools/Traits/IpTrait.php',
     'App\\Http\\Tools\\Warning\\DingTalk' => $baseDir . '/app/Http/Tools/Warning/DingTalk.php',
     'App\\Http\\Tools\\Warning\\WarningInterface' => $baseDir . '/app/Http/Tools/Warning/WarningInterface.php',
+    'App\\Jobs\\TestDispatch' => $baseDir . '/app/Jobs/TestDispatch.php',
+    'App\\Jobs\\TestDispatchInQueue' => $baseDir . '/app/Jobs/TestDispatchInQueue.php',
     'App\\Jobs\\TestJob' => $baseDir . '/app/Jobs/TestJob.php',
     'App\\Jobs\\TestRelease' => $baseDir . '/app/Jobs/TestRelease.php',
     'App\\Listeners\\AddPaginationStatusToResponse' => $baseDir . '/app/Listeners/AddPaginationStatusToResponse.php',

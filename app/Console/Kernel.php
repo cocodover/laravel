@@ -2,11 +2,6 @@
 
 namespace App\Console;
 
-use App\Console\Commands\EatingCensus;
-use App\Console\Commands\ClockInAndOut;
-use App\Console\Commands\ClockInAndOutForYunYing;
-use App\Console\Commands\ScheduleReminder;
-use App\Console\Commands\TestCommand;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -28,7 +23,7 @@ class Kernel extends ConsoleKernel
      * 学习文档 https://learnku.com/docs/laravel/5.5/scheduling/1325
      * Define the application's command schedule.
      *
-     * @param \Illuminate\Console\Scheduling\Schedule $schedule
+     * @param Schedule $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)

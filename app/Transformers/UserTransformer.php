@@ -3,6 +3,7 @@
 namespace App\Transformers;
 
 use App\User;
+use League\Fractal\Resource\Item;
 use League\Fractal\TransformerAbstract;
 
 class UserTransformer extends TransformerAbstract
@@ -15,7 +16,7 @@ class UserTransformer extends TransformerAbstract
      * @param User $user
      * @return array
      */
-    public function transform(User $user)
+    public function transform(User $user): array
     {
         return [
             'id' => $user->id,
@@ -28,9 +29,9 @@ class UserTransformer extends TransformerAbstract
     /**
      * 引入关联模型
      * @param User $user
-     * @return \League\Fractal\Resource\Item
+     * @return Item
      */
-    public function includeRole(User $user)
+    public function includeRole(User $user): Item
     {
         $role = $user->role;
         return $this->item($role, new RoleTransformer());

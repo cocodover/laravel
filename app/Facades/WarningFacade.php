@@ -12,11 +12,9 @@ class WarningFacade extends Facade
         switch (config('params.warning_type')) {
             case 'dingtalk':
                 return new DingTalk();
-                break;
             default:
                 //等同于 'App\Http\Tools\DingTalk'
                 return DingTalk::class;
-                break;
         }
     }
 }

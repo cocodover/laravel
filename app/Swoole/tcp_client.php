@@ -1,8 +1,10 @@
 <?php
 
 //Swoole4以后通过协程来实现异步通信
-go(function () {
-    $client = new \Swoole\Coroutine\Client(SWOOLE_SOCK_TCP);
+use Swoole\Coroutine\Client;
+
+go(static function () {
+    $client = new Client(SWOOLE_SOCK_TCP);
 
     //尝试与指定 TCP 服务端建立连接（IP和端口号需要与服务端保持一致，超时时间为0.5秒）
     if ($client->connect('localhost', 9502, 0.5)) {

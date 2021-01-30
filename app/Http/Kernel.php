@@ -2,7 +2,24 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\EncryptCookies;
+use App\Http\Middleware\RedirectIfAuthenticated;
+use App\Http\Middleware\TrimStrings;
+use App\Http\Middleware\TrustProxies;
+use App\Http\Middleware\VerifyCsrfToken;
+use Fruitcake\Cors\HandleCors;
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\Middleware\AuthenticateWithBasicAuth;
+use Illuminate\Auth\Middleware\Authorize;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class Kernel extends HttpKernel
 {
@@ -15,12 +32,12 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
-        \Fruitcake\Cors\HandleCors::class,//跨域问题处理(cors) 需要放在最上面
-        \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,
-        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-        \App\Http\Middleware\TrimStrings::class,//去除请求参数两侧空格
-        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,//转换空字符串为null
-        \App\Http\Middleware\TrustProxies::class,
+        HandleCors::class,//跨域问题处理(cors) 需要放在最上面
+        CheckForMaintenanceMode::class,
+        ValidatePostSize::class,
+        TrimStrings::class,//去除请求参数两侧空格
+        ConvertEmptyStringsToNull::class,//转换空字符串为null
+        TrustProxies::class,
         /*
          * 三方扩展中间件
          */
@@ -34,13 +51,13 @@ class Kernel extends HttpKernel
      */
     protected $middlewareGroups = [
         'web' => [
-            \App\Http\Middleware\EncryptCookies::class,
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \Illuminate\Session\Middleware\StartSession::class,
+            EncryptCookies::class,
+            AddQueuedCookiesToResponse::class,
+            StartSession::class,
 //            \Illuminate\Session\Middleware\AuthenticateSession::class,
-            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \App\Http\Middleware\VerifyCsrfToken::class,//跨站请求伪造（CSRF）保护
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            ShareErrorsFromSession::class,
+            VerifyCsrfToken::class,//跨站请求伪造（CSRF）保护
+            SubstituteBindings::class,
         ],
 
         'api' => [
@@ -64,15 +81,15 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
-        'auth' => \Illuminate\Auth\Middleware\Authenticate::class,//认证相关(将未登录用户重定向到登录页面)
-        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,//HTTP的简单认证
-        'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        'can' => \Illuminate\Auth\Middleware\Authorize::class,
-        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,//认证相关(将已登录用户重定向到认证后页面，未登录则继续原来的请求)
-        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,//用户多次登录失败时使用(单位登录失败超过指定次数不允许继续发起登录请求，提高系统安全性)
+        'auth' => Authenticate::class,//认证相关(将未登录用户重定向到登录页面)
+        'auth.basic' => AuthenticateWithBasicAuth::class,//HTTP的简单认证
+        'bindings' => SubstituteBindings::class,
+        'can' => Authorize::class,
+        'guest' => RedirectIfAuthenticated::class,//认证相关(将已登录用户重定向到认证后页面，未登录则继续原来的请求)
+        'throttle' => ThrottleRequests::class,//用户多次登录失败时使用(单位登录失败超过指定次数不允许继续发起登录请求，提高系统安全性)
         /*
          * 自定义中间件
          */
-        'rbac' => \App\Http\Middleware\Authorize::class,//jwt权限管理
+        'rbac' => Middleware\Authorize::class,//jwt权限管理
     ];
 }

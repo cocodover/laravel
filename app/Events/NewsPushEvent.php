@@ -46,7 +46,7 @@ class NewsPushEvent implements ShouldBroadcast
      *
      * Get the channels the event should broadcast on.
      *
-     * @return \Illuminate\Broadcasting\Channel|array
+     * @return Channel|array
      */
     public function broadcastOn()
     {
@@ -68,7 +68,7 @@ class NewsPushEvent implements ShouldBroadcast
      *
      * @return array
      */
-    public function broadcastWith()
+    public function broadcastWith(): array
     {
         return ['msg' => $this->message];
     }

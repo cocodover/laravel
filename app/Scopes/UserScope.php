@@ -15,7 +15,7 @@ class UserScope implements Scope
      * @param Model $model
      * @return Builder|void
      */
-    public function apply(Builder $builder, Model $model)
+    public function apply(Builder $builder, Model $model): Builder
     {
         /**
          * @var User $user

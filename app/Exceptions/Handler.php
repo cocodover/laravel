@@ -6,7 +6,11 @@ use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 
 class Handler extends ExceptionHandler
 {
@@ -42,9 +46,9 @@ class Handler extends ExceptionHandler
 
     /**
      * 渲染各种异常的浏览器输出
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param Exception $exception
-     * @return \Illuminate\Http\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function render($request, Exception $exception)
     {
@@ -66,9 +70,9 @@ class Handler extends ExceptionHandler
 
     /**
      * 自定义未通过认证(中间件)的响应
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param AuthenticationException $exception
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @return JsonResponse|RedirectResponse|\Illuminate\Http\Response
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {

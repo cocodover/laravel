@@ -7,7 +7,9 @@
 
 //创建服务(tcp/udp/unixSocket) SWOOLE_BASE模式和nginx一致 若服务出现错误请求将直接结束
 //$server = new \Swoole\Server('0.0.0.0', '9502', SWOOLE_PROCESS, SWOOLE_SOCK_TCP);
-$server = new \Swoole\WebSocket\Server('0.0.0.0', '9503');
+use Swoole\WebSocket\Server;
+
+$server = new Server('0.0.0.0', '9503');
 
 //设置参数 https://wiki.swoole.com/#/server/setting
 $server->set([
@@ -89,13 +91,13 @@ $server->on('WorkerStart', function (\Swoole\Server $server, int $workerId) {
 });
 
 //Worker进程终止时发生,可以回收Worker进程申请的各类资源
-$server->on('WorkerStop', function (\Swoole\Server $server, int $workerId) {
-    //todo
+$server->on('WorkerStop', static function (\Swoole\Server $server, int $workerId) {
+    //
 });
 
 //仅在开启reload_async特性后有效,等待Worker进程退出后才会执行onWorkerStop事件回调
-$server->on('WorkerExit', function (\Swoole\Server $server, int $workerId) {
-    //todo
+$server->on('WorkerExit', static function (\Swoole\Server $server, int $workerId) {
+    //
 });
 
 //有新的连接进入时,在Worker进程中回调(不适用于dispatch_mode为轮循模式/抢占模式)
@@ -149,8 +151,8 @@ $server->on('ManagerStart', function (\Swoole\Server $server) {
 });
 
 //当Manager进程结束时触发(此时Task&Worker进程已经被Manager进程回收)
-$server->on('ManagerStop', function (\Swoole\Server $server) {
-    //todo
+$server->on('ManagerStop', static function (\Swoole\Server $server) {
+    //
 });
 
 //Worker进程Reload之前触发此事件,在Manager进程中回调
@@ -162,8 +164,8 @@ $server->on('ManagerStop', function (\Swoole\Server $server) {
 //});
 
 //当服务器收到来自客户端的数据帧时会回调此函数(websocket特有)
-$server->on('Message', function (\Swoole\WebSocket\Server $server, Swoole\WebSocket\Frame $frame) {
-    //todo
+$server->on('Message', static function (Server $server, Swoole\WebSocket\Frame $frame) {
+    //
 });
 
 //启动服务

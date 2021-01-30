@@ -2,10 +2,11 @@
 
 namespace Controllers;
 
-use App\Role;
 use Lib\SwooleWebsocketServer;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
+use const Task\RABBITMQ_PUSH;
+use const Task\WEBSOCKET_PUSH;
 
 /**
  * 接收请求入口
@@ -86,7 +87,7 @@ class ApiController
         //投递异步任务到task_worker池(不指定task_id底层根据task进程忙碌状态进行任务投递,若所有task均不空闲,底层轮询投递任务到各个进程)
         //若投递容量超过处理能力,task数据塞满缓存区,导致worker进程发生阻塞(无法接收新的请求,间接导致499问题——客户端等待时间过长断开连接)
         $data = [
-            'type' => \Task\RABBITMQ_PUSH,//指定任务类型
+            'type' => RABBITMQ_PUSH,//指定任务类型
             'data' => $chatData//投递数据
         ];
         $taskId = $this->server->task($data);
@@ -109,7 +110,7 @@ class ApiController
 
         //推送至异步任务
         $data = [
-            'type' => \Task\WEBSOCKET_PUSH,
+            'type' => WEBSOCKET_PUSH,
             'data' => $message
         ];
         $taskId = $this->server->task($data);

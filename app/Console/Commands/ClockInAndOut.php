@@ -23,16 +23,6 @@ class ClockInAndOut extends Command
     protected $description = '上下班打卡提醒';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return void

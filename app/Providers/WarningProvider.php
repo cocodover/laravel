@@ -36,10 +36,8 @@ class WarningProvider extends ServiceProvider
             switch (config('params.warning_type')) {
                 case 'dingtalk':
                     return new DingTalk();
-                    break;
                 default:
                     return new DingTalk();
-                    break;
             }
         });
     }

@@ -8,7 +8,7 @@
 require_once dirname(__DIR__, 3) . '/vendor/autoload.php';
 
 //自动加载文件
-spl_autoload_register(function ($class) {
+spl_autoload_register(static function ($class) {
     //将\替换为/
     $className = str_replace('\\', DIRECTORY_SEPARATOR, $class);
     $classPath = sprintf('%s/%s.php', __DIR__, $className);

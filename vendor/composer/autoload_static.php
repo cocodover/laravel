@@ -662,6 +662,8 @@ class ComposerStaticInit80e6f9e9e0d81f1e849df966513f64d9
         'App\\Http\\Tools\\Traits\\IpTrait' => __DIR__ . '/../..' . '/app/Http/Tools/Traits/IpTrait.php',
         'App\\Http\\Tools\\Warning\\DingTalk' => __DIR__ . '/../..' . '/app/Http/Tools/Warning/DingTalk.php',
         'App\\Http\\Tools\\Warning\\WarningInterface' => __DIR__ . '/../..' . '/app/Http/Tools/Warning/WarningInterface.php',
+        'App\\Jobs\\TestDispatch' => __DIR__ . '/../..' . '/app/Jobs/TestDispatch.php',
+        'App\\Jobs\\TestDispatchInQueue' => __DIR__ . '/../..' . '/app/Jobs/TestDispatchInQueue.php',
         'App\\Jobs\\TestJob' => __DIR__ . '/../..' . '/app/Jobs/TestJob.php',
         'App\\Jobs\\TestRelease' => __DIR__ . '/../..' . '/app/Jobs/TestRelease.php',
         'App\\Listeners\\AddPaginationStatusToResponse' => __DIR__ . '/../..' . '/app/Listeners/AddPaginationStatusToResponse.php',

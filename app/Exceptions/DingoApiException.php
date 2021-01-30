@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Exception;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
@@ -16,11 +17,11 @@ class DingoApiException extends HttpException
      * DingoApiException constructor.
      * @param $statusCode
      * @param null $message
-     * @param \Exception|null $previous
+     * @param Exception|null $previous
      * @param array $headers
      * @param int $code
      */
-    public function __construct($statusCode, $message = null, \Exception $previous = null, array $headers = [], $code = 0)
+    public function __construct($statusCode, $message = null, Exception $previous = null, array $headers = [], $code = 0)
     {
         parent::__construct($statusCode, $message, $previous, $headers, $code);
     }

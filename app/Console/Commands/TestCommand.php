@@ -2,10 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\TestDispatch;
-use App\Jobs\TestRelease;
+use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
 
 /**
  * 学习文档 https://learnku.com/docs/laravel/5.5/artisan/1314
@@ -31,17 +29,7 @@ class TestCommand extends Command
     protected $description = '测试脚本';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function handle()
     {

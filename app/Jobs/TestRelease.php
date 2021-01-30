@@ -39,7 +39,7 @@ class TestRelease implements ShouldQueue
             'attempts' => $attempts
         ]));
 
-        return $this->retry();
+        $this->retry();
     }
 
     /**

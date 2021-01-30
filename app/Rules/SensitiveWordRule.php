@@ -24,7 +24,7 @@ class SensitiveWordRule implements Rule
      * @param mixed $value
      * @return bool
      */
-    public function passes($attribute, $value)
+    public function passes($attribute, $value): bool
     {
         return strpos($value, '敏感词') === false;
     }
@@ -35,7 +35,7 @@ class SensitiveWordRule implements Rule
      *
      * @return string
      */
-    public function message()
+    public function message(): string
     {
         return ':attribute输入字段中包含敏感词';
     }

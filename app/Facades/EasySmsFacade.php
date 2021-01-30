@@ -7,7 +7,7 @@ use Overtrue\EasySms\EasySms;
 
 class EasySmsFacade extends Facade
 {
-    protected static function getFacadeAccessor()
+    protected static function getFacadeAccessor(): EasySms
     {
         return new EasySms(config('easysms'));
     }

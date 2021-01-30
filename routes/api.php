@@ -1,5 +1,8 @@
 <?php
 
+use App\User;
+use Dingo\Api\Dispatcher;
+use Dingo\Api\Routing\Router;
 use Illuminate\Http\Request;
 
 //接口路由
@@ -33,7 +36,7 @@ Route::group(['prefix' => 'test'], function () {
     Route::get('/redirect', 'TestController@testRedirect')->name('test.redirect');
     //路由模型绑定 https://xueyuanjun.com/post/9615
     Route::get('/user/{id}', function ($id) {
-        $user = \App\User::findOrFail($id);
+        $user = User::findOrFail($id);
         return $user->only(['name', 'email']);
     })->name('test.user');
     //兜底路由
@@ -147,9 +150,9 @@ Route::group(['prefix' => 'resource'], function () {
  * dingo api路由
  * 每次请求需要添加请求头 Accept: application/Accept: application/x.laravel.v1+json
  */
-$api = app(\Dingo\Api\Routing\Router::class);
+$api = app(Router::class);
 
-$api->version('v1', function (\Dingo\Api\Routing\Router $api) {
+$api->version('v1', function (Router $api) {
     //测试配置环境
     $api->get('/test', function () {
         return response()->json('dingo api 测试成功');
@@ -158,7 +161,7 @@ $api->version('v1', function (\Dingo\Api\Routing\Router $api) {
     $api->group([
         'prefix' => 'test',
         'namespace' => '\App\Http\Controllers\DingoApi'
-    ], function (\Dingo\Api\Routing\Router $api) {
+    ], function (Router $api) {
         //响应构建器
         $api->get('/response', 'ApiTestController@testResponse')->name('dingo_api.test.response');
         /*
@@ -175,7 +178,7 @@ $api->version('v1', function (\Dingo\Api\Routing\Router $api) {
         $api->get('/throttleReal', 'ApiTestController@testThrottle')->name('dingo_api.test.throttleReal');
         $api->get('throttle', ['middleware' => 'api.throttle', 'limit' => 3, 'expires' => 1, function () {
             //内部请求 https://xueyuanjun.com/post/19683.html
-            $dispatcher = app(\Dingo\Api\Dispatcher::class);
+            $dispatcher = app(Dispatcher::class);
             return $dispatcher->version('v1')->get('test/throttleReal');
         }]);
     });

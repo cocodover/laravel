@@ -22,16 +22,6 @@ class ScheduleReminder extends Command
     protected $description = '小组群排期统计提醒';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return void

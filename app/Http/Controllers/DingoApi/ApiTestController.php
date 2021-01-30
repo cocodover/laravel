@@ -2,16 +2,12 @@
 
 namespace App\Http\Controllers\DingoApi;
 
-use App\Exceptions\DingoApiException;
 use App\Transformers\UserTransformer;
 use App\User;
+use Dingo\Api\Http\Response;
 use League\Fractal\Manager;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
-use League\Fractal\Serializer\ArraySerializer;
-use League\Fractal\Serializer\DataArraySerializer;
-use League\Fractal\Serializer\JsonApiSerializer;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class ApiTestController extends ApiController
@@ -54,7 +50,7 @@ class ApiTestController extends ApiController
      * 资源转化器
      * @return string
      */
-    public function testFractal()
+    public function testFractal(): string
     {
         //获取资源
 //        $user = User::findOrFail(1);
@@ -101,9 +97,9 @@ class ApiTestController extends ApiController
 
     /**
      * 在响应构建器中使用转化器
-     * @return \Dingo\Api\Http\Response
+     * @return Response
      */
-    public function testResponseFractal()
+    public function testResponseFractal(): Response
     {
         //单个资源
 //        $user = User::findOrFail(1);
@@ -133,7 +129,7 @@ class ApiTestController extends ApiController
 
         //获取认证用户信息
         $user = $this->auth()->user();
-        return $this->response->array($user->toArray());
+        return $this->response->array($user ? $user->toArray() : []);
     }
 
     /**

@@ -14,6 +14,9 @@ use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Server\Task;
 use Swoole\WebSocket\Frame;
+use const Task\RABBITMQ_PUSH;
+use const Task\UNDEFINED;
+use const Task\WEBSOCKET_PUSH;
 
 class SwooleWorker
 {
@@ -192,15 +195,15 @@ class SwooleWorker
         $taskStart = microtime(true);
         if (isset($task->data['data'])) {
             //根据任务类型进行对应处理
-            $data['type'] = $task->data['type'] ?? \Task\UNDEFINED;
+            $data['type'] = $task->data['type'] ?? UNDEFINED;
             switch ($data['type']) {
-                case \Task\RABBITMQ_PUSH:
+                case RABBITMQ_PUSH:
                     $taskController->rabbitMQPush($task->data['data']);
                     break;
-                case \Task\WEBSOCKET_PUSH:
+                case WEBSOCKET_PUSH:
                     $taskController->websocketPush($task->data['data']);
                     break;
-                case \Task\UNDEFINED:
+                case UNDEFINED:
                 default:
                     echo("warning:task type not defined\n");
                     break;
@@ -302,12 +305,10 @@ class SwooleWorker
             } else {
                 echo "websocket closed:fd {$fd}\n";
             }
+        } else if ($reactorId === -1) {//服务端主动关闭连接
+            echo "server close tcp:fd {$fd}\n";
         } else {
-            if ($reactorId === -1) {//服务端主动关闭连接
-                echo "server close tcp:fd {$fd}\n";
-            } else {
-                echo "tcp closed:fd {$fd}\n";
-            }
+            echo "tcp closed:fd {$fd}\n";
         }
     }
 }

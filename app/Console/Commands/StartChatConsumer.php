@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -42,6 +43,7 @@ class StartChatConsumer extends Command
 
     /**
      * 绑定rabbitmq消费数据
+     * @throws Exception
      */
     public function handle()
     {
@@ -106,7 +108,7 @@ class StartChatConsumer extends Command
             try {
                 //等待通道推送下一条数据,这里只会消费一条数据
                 $channel->wait();
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 Log::error(json_encode([
                     'notice' => 'chat consuming error',
                     'message' => $exception->getMessage()

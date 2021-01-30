@@ -13,9 +13,9 @@ class DingTalk implements WarningInterface
      * 发送钉钉报警
      * @param null $group
      * @param null $content
-     * @param array $mobile
+     * @param array $mobiles
      */
-    public static function warning($group = null, $content = null, $mobile = array())
+    public static function warning($group = null, $content = null, $mobiles = array())
     {
         //获取参数配置
         $params = config('params.dingtalk');
@@ -23,7 +23,7 @@ class DingTalk implements WarningInterface
             $group = 'default';
         }
         //获取构建参数
-        $data = self::getTextWarningData($params[$group]['keywords'], $content, $mobile);
+        $data = self::getTextWarningData($params[$group]['keywords'], $content, $mobiles);
         //获取报警url
         $url = self::DING_NOTIFY_URL . $params[$group]['token'];
         //发送报警信息
@@ -40,7 +40,7 @@ class DingTalk implements WarningInterface
      * @param array $mobile
      * @return array
      */
-    private static function getTextWarningData($keywords = null, $content = null, $mobile = array())
+    private static function getTextWarningData($keywords = null, $content = null, $mobile = array()): array
     {
         //没传手机号时@所有人，传入手机号时只@特定的人
         $flag = empty($mobile);

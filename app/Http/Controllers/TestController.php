@@ -9,22 +9,24 @@ use App\Http\Requests\FileUploadRequest;
 use App\Http\Tools\Warning\WarningInterface;
 use App\Jobs\TestJob;
 use App\Mail\UserRegistered;
-use App\Models\Record;
-use App\Role;
-use App\Scopes\UserScope;
 use App\User;
 use Exception;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Overtrue\EasySms\Exceptions\InvalidArgumentException;
 use Overtrue\EasySms\Exceptions\NoGatewayAvailableException;
 use SMS;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Web控制器 的职责就是真实应用的传输层:仅负责收集用户请求数据,然后将其传递给处理方
@@ -35,7 +37,7 @@ class TestController extends Controller
 {
     /**
      * 测试控制器
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return RedirectResponse|Redirector
      */
     public function testController()
     {
@@ -46,7 +48,7 @@ class TestController extends Controller
      * 测试重定向
      * @return string
      */
-    public function testRedirect()
+    public function testRedirect(): string
     {
         return '测试重定向成功';
     }
@@ -56,7 +58,7 @@ class TestController extends Controller
      * @param Request $request
      * @return string
      */
-    public function testFallback(Request $request)
+    public function testFallback(Request $request): string
     {
         return $request->getBaseUrl() . $request->getUri() . ' ' . '路径不存在';
     }
@@ -91,7 +93,7 @@ class TestController extends Controller
     /**
      * 测试表单验证
      * @param FileUploadRequest $request
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     * @return ResponseFactory|Response
      */
     public function testValidate(FileUploadRequest $request)
     {
@@ -100,9 +102,9 @@ class TestController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function testDatabase(Request $request)
+    public function testDatabase(Request $request): JsonResponse
     {
         /*
          * 原生SQL
@@ -304,14 +306,15 @@ class TestController extends Controller
 //        $users = User::query()->paginate(2);
 
         //临时测试
-        $this->dbTest($request);
+        $this->testDB($request);
+        return response()->json('SQL执行完毕');
     }
 
     /**
      * 数据库写法测试
      * @param Request $request
      */
-    private function dbTest(Request $request)
+    private function testDB(Request $request)
     {
     }
 
@@ -345,7 +348,7 @@ class TestController extends Controller
     /**
      * 文件上传测试
      * @param Request $request
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     * @return ResponseFactory|Response
      */
     public function testFileUploads(Request $request)
     {
@@ -355,7 +358,7 @@ class TestController extends Controller
             //若文件上传成功
             if ($file->isValid()) {
                 //获取文件名
-                $originalName = $file->getClientOriginalName();
+//                $originalName = $file->getClientOriginalName();
                 //获取扩展名
                 $originalExtension = $file->getClientOriginalExtension();
                 //获取文件大小
@@ -382,9 +385,9 @@ class TestController extends Controller
 
     /**
      * 校验认证功能
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function testAuth()
+    public function testAuth(): JsonResponse
     {
         //指定api为认证服务方(token验证)
         $id = Auth::guard('api')->id();
@@ -400,7 +403,7 @@ class TestController extends Controller
     /**
      * 检查路由访问权限
      * @param Request $request
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     * @return ResponseFactory|Response
      */
     public function testPermission(Request $request)
     {
@@ -424,7 +427,7 @@ class TestController extends Controller
 
     /**
      * 检查用户数据更新权限
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     * @return ResponseFactory|Response
      */
     public function testPolicy()
     {
@@ -451,9 +454,9 @@ class TestController extends Controller
     /**
      * 测试请求api
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function testRequest(Request $request)
+    public function testRequest(Request $request): JsonResponse
     {
         $uri = $request->getPathInfo();
         $uri = trim($uri, '/');
@@ -463,9 +466,9 @@ class TestController extends Controller
     /**
      * 测试响应api
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return BinaryFileResponse
      */
-    public function testResponse(Request $request)
+    public function testResponse(Request $request): BinaryFileResponse
     {
         $path = storage_path('app/public') . '/' . $request->input('file_name');
         $fileName = 'data_' . date('Y-m-d') . '.' . pathinfo($path)['extension'];
@@ -476,9 +479,9 @@ class TestController extends Controller
 
     /**
      * 测试触发artisan命令
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function testArtisan()
+    public function testArtisan(): JsonResponse
     {
         Artisan::call('test');
         return response()->json('success');
@@ -486,9 +489,9 @@ class TestController extends Controller
 
     /**
      * 测试缓存api
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function testCache()
+    public function testCache(): JsonResponse
     {
         //这里注意用cache门面存储的键名是有前缀的
         Cache::put('cache_test', 'success', 1);
@@ -498,9 +501,9 @@ class TestController extends Controller
 
     /**
      * 测试集合
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function testCollection()
+    public function testCollection(): JsonResponse
     {
         $collection = collect(['a' => 1, 'b' => 2, 'c' => 3]);
         $count = $collection->count();
@@ -509,9 +512,9 @@ class TestController extends Controller
 
     /**
      * 测试队列
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function testQueue()
+    public function testQueue(): JsonResponse
     {
         /*
          * php artisan queue:work redis --queue=test --tries=3 --timeout=10
@@ -525,9 +528,10 @@ class TestController extends Controller
 
     /**
      * 测试辅助函数
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function testHelper(Request $request)
+    public function testHelper(Request $request): JsonResponse
     {
         //获取项目路径
 //        $path = base_path();
@@ -563,15 +567,15 @@ class TestController extends Controller
         );
         if ($validator->fails()) {
             return response()->json('校验失败');
-        } else {
-            return response()->json('校验成功');
         }
+
+        return response()->json('校验成功');
     }
 
     /**
      * 测试事件
      * @param Request $request
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     * @return ResponseFactory|Response
      */
     public function testEvent(Request $request)
     {
@@ -583,7 +587,7 @@ class TestController extends Controller
     /**
      * 测试广播
      * @param Request $request
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     * @return ResponseFactory|Response
      */
     public function testBroadcast(Request $request)
     {
@@ -595,9 +599,9 @@ class TestController extends Controller
     /**
      * 测试获取通知
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function testNotifications(Request $request)
+    public function testNotifications(Request $request): JsonResponse
     {
         //获取用户信息
         $userId = $request->input('user_id');
@@ -623,9 +627,9 @@ class TestController extends Controller
     /**
      * 测试标记通知已读
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function testMarkNotification(Request $request)
+    public function testMarkNotification(Request $request): JsonResponse
     {
         //获取用户信息
         $userId = $request->input('user_id');
@@ -644,7 +648,7 @@ class TestController extends Controller
      * 邮件模板预览
      * @return UserRegistered
      */
-    public function testMail()
+    public function testMail(): UserRegistered
     {
         $user = User::find(1);
         return new UserRegistered($user);
@@ -652,10 +656,10 @@ class TestController extends Controller
 
     /**
      * 测试短信发送
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Overtrue\EasySms\Exceptions\InvalidArgumentException
+     * @return JsonResponse
+     * @throws InvalidArgumentException
      */
-    public function testSms()
+    public function testSms(): JsonResponse
     {
         //指定短信接收者
         $phone = '18857876819';
