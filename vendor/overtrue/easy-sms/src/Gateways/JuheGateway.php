@@ -32,8 +32,8 @@ class JuheGateway extends Gateway
 
     /**
      * @param \Overtrue\EasySms\Contracts\PhoneNumberInterface $to
-     * @param \Overtrue\EasySms\Contracts\MessageInterface $message
-     * @param \Overtrue\EasySms\Support\Config $config
+     * @param \Overtrue\EasySms\Contracts\MessageInterface     $message
+     * @param \Overtrue\EasySms\Support\Config                 $config
      *
      * @return array
      *
@@ -59,19 +59,18 @@ class JuheGateway extends Gateway
     }
 
     /**
-     * 该方法已被修改
      * @param array $vars
      *
      * @return string
      */
     protected function formatTemplateVars(array $vars)
     {
-        $formatted = '';
+        $formatted = [];
 
         foreach ($vars as $key => $value) {
-            $formatted = sprintf('#%s#', trim($key, '#')) . '=' . $value . '&';
+            $formatted[sprintf('#%s#', trim($key, '#'))] = $value;
         }
 
-        return urlencode(substr($formatted, 0, -1));
+        return http_build_query($formatted);
     }
 }

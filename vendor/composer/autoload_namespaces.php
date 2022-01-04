@@ -11,6 +11,7 @@ return array(
     'Parsedown' => array($vendorDir . '/erusev/parsedown'),
     'Mpociot' => array($vendorDir . '/mpociot/reflection-docblock/src'),
     'Mockery' => array($vendorDir . '/mockery/mockery/library'),
+    'HTMLPurifier' => array($vendorDir . '/ezyang/htmlpurifier/library'),
     'Doctrine\\DBAL\\' => array($vendorDir . '/doctrine/dbal/lib'),
     'Doctrine\\Common\\Collections\\' => array($vendorDir . '/doctrine/collections/lib'),
     'Barryvdh' => array($vendorDir . '/barryvdh/reflection-docblock/src'),

@@ -3,7 +3,7 @@
 
 /**
  * A helper file for Laravel 5, to provide autocomplete information to your IDE
- * Generated for Laravel 5.5.50 on 2020-09-09 11:49:55.
+ * Generated for Laravel 5.5.50 on 2021-06-13 19:41:12.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -7866,6 +7866,8 @@ namespace Illuminate\Support\Facades {
     /**
      * 
      *
+     * @see \Illuminate\Redis\RedisManager
+     * @see \Illuminate\Contracts\Redis\Factory
      */ 
     class Redis {
         
@@ -15453,12 +15455,12 @@ namespace App\Facades {
          *
          * @param null $group
          * @param null $content
-         * @param array $mobile
+         * @param array $mobiles
          * @static 
          */ 
-        public static function warning($group = null, $content = null, $mobile = [])
+        public static function warning($group = null, $content = null, $mobiles = [])
         {
-                        return \App\Http\Tools\Warning\DingTalk::warning($group, $content, $mobile);
+                        return \App\Http\Tools\Warning\DingTalk::warning($group, $content, $mobiles);
         }
          
     }

@@ -11,6 +11,7 @@ use App\Jobs\TestJob;
 use App\Mail\UserRegistered;
 use App\User;
 use Exception;
+use Generator;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -22,8 +23,12 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Iterator;
 use Overtrue\EasySms\Exceptions\InvalidArgumentException;
 use Overtrue\EasySms\Exceptions\NoGatewayAvailableException;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use SMS;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -694,5 +699,117 @@ class TestController extends Controller
             ]));
             return response()->json('短信发送失败');
         }
+    }
+
+    /**
+     * 测试导出
+     *
+     * @throws Exception
+     */
+    public function testDownload()
+    {
+        $header = [
+            'workOrderNo' => '工单号',
+            'item' => '服务内容',
+            'settlement' => '结算价'
+        ];
+        $baseData = [
+            [
+                'workOrderNo' => 1,
+                'item' => 'a-1',
+                'settlement' => '0.01'
+            ],
+            [
+                'workOrderNo' => 2,
+                'item' => 'a-2',
+                'settlement' => '100.01'
+            ]
+        ];
+        $excel = $this->makeExcel('example', $header, iterator_to_array($this->transformData($baseData)));
+        $this->downloadExcel($excel, 'test', 'xlsx');
+    }
+
+    /**
+     * @param array $baseData
+     * @return Generator
+     */
+    private function transformData(array $baseData)
+    {
+        foreach ($baseData as $baseDatum) {
+            yield [
+                'workOrderNo' => $baseDatum['workOrderNo'],
+                'item' => $baseDatum['item'],
+                'settlement' => $baseDatum['settlement']
+            ];
+        }
+    }
+
+    /**
+     * 生成excel表格
+     *
+     * @param string $sheetName
+     * @param array $header
+     * @param mixed $data
+     * @return Spreadsheet
+     * @throws Exception
+     */
+    private function makeExcel(string $sheetName, array $header, $data): Spreadsheet
+    {
+        if (!is_array($data) && !$data instanceof Iterator) {
+            throw new Exception('参数错误');
+        }
+
+        $excel = new Spreadsheet();
+        $sheet = $excel->getActiveSheet();
+        $sheet->setTitle($sheetName);
+
+        //处理列和头部
+        $index = 1;
+        $map = [];
+        foreach ($header as $field => $title) {
+            $columnName = Coordinate::stringFromColumnIndex($index);
+            $sheet->getColumnDimension($columnName)->setAutoSize(true);//没啥用因为生成时算不精准具体宽度
+            $sheet->getStyle("{$columnName}1")->getFont()->setBold(true);
+            $sheet->setCellValue("{$columnName}1", $title);
+            $map[$field] = $columnName;
+            $index++;
+        }
+
+        //处理数据
+        $row = 2;
+        foreach ($data as $datum) {
+            foreach ($map as $field => $columnName) {
+                $sheet->setCellValue("{$columnName}{$row}", $datum[$field]);
+            }
+            $row++;
+        }
+        return $excel;
+    }
+
+    /**
+     * 导出excel
+     *
+     * @param Spreadsheet $excel
+     * @param string $fileName
+     * @param string $format
+     * @throws Exception
+     */
+    private function downloadExcel(Spreadsheet $excel, string $fileName, string $format)
+    {
+        $format = strtolower($format);
+        if ($format === 'xlsx') {
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        } elseif ($format === 'xls') {
+            header('Content-Type: application/vnd.ms-excel');
+        } else {
+            throw new Exception('暂不支持该格式导出');
+        }
+
+        header("Content-Disposition: attachment;filename={$fileName}.{$format}");
+        header('Cache-Control: max-age=0');
+        $writer = IOFactory::createWriter($excel, ucwords($format));
+        ob_end_clean();//php7.4问题
+        $writer->save('php://output');
+        exit();
     }
 }

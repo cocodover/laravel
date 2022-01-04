@@ -122,6 +122,8 @@ Route::group(['prefix' => 'test'], function () {
     Route::get('/mail', 'TestController@testMail')->name('test.mail');
     //短信
     Route::get('/sms', 'TestController@testSms')->name('test.sms');
+    //下载
+    Route::get('download', 'TestController@testDownload')->name('test.download');
 });
 
 /**

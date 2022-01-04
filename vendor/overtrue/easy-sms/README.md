@@ -47,6 +47,9 @@
 - [七牛云](https://www.qiniu.com/)
 - [UE35.net](http://uesms.ue35.cn/)
 - [Ucloud](https://www.ucloud.cn)
+- [短信宝](http://www.smsbao.com/)
+- [Tiniyo](https://tiniyo.com/)
+- [摩杜云](https://www.moduyun.com/)
 
 ## 环境需求
 
@@ -516,6 +519,20 @@ $easySms->send(13188888888, $message);
     ],
 ```
 
+### [tiniyo](https://www.tiniyo.com)
+
+短信使用 `content`
+发送对象需要 使用`+`添加区号
+
+```php
+    'tiniyo' => [
+        'account_sid' => '', // auth_id from https://tiniyo.com
+        'from' => '', // 发送的号码 可以在控制台购买
+        'token' => '', // auth_secret from https://tiniyo.com
+    ],	    
+```
+
+
 ### [腾讯云 SMS](https://cloud.tencent.com/product/sms)
 
 短信内容使用 `content`
@@ -526,6 +543,18 @@ $easySms->send(13188888888, $message);
         'app_key' => '', // APP KEY
         'sign_name' => '', // 短信签名，如果使用默认签名，该字段可缺省（对应官方文档中的sign）
     ],
+```
+
+发送示例：
+
+```php
+$easySms->send(18888888888, [
+    'template' => 101234, // 模板ID
+    'content' => "您的动态验证码为：{1}，请于5分钟内完成验证，如非本人操作，请忽略本短信！", // 模板内容
+    'data' => [ 
+        $code, // 模板变量
+    ],
+]);
 ```
 
 ### [阿凡达数据](http://www.avatardata.cn/)
@@ -681,6 +710,48 @@ $easySms->send(18888888888, [
     'data' => [
         'code' => 1234,     //模板参数，模板没有参数不用则填写，有多个参数请用数组，[1111,1111]
         'mobiles' =>'',     //同时发送多个手机短信，请用数组[xxx,xxx]
+    ],
+]);
+
+```
+
+
+### [短信宝](http://www.smsbao.com/)
+短信使用 `template`
+
+```php
+  'smsbao' => [
+        'user'  => '',    //账号
+        'password'   => ''   //密码
+    ],
+```
+
+```php
+$easySms->send(18888888888, [
+    'template' => '您的验证码为: 6379',       //短信模板
+]);
+
+```
+
+### [摩杜云](https://www.moduyun.com/)
+短信使用 `template` + `data`
+
+```php
+  'moduyun' => [
+        'accesskey' => '',  //必填 ACCESS KEY
+        'secretkey' => '',  //必填 SECRET KEY
+        'signId'    => '',  //选填 短信签名，如果使用默认签名，该字段可缺省
+        'type'      => 0,   //选填 0:普通短信;1:营销短信
+    ],
+```
+
+```php
+$easySms->send(18888888888, [
+    'template' => '5a95****b953',   //短信模板
+    'data' => [
+        1234,   //模板参数，对应模板的{1}
+        30      //模板参数，对应模板的{2}
+        //...
     ],
 ]);
 
